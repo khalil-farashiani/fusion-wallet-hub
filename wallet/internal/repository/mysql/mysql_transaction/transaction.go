@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/khalil-farashiani/fusion-wallet-hub/pkg/errmsg"
 	"github.com/khalil-farashiani/fusion-wallet-hub/pkg/richerror"
+	entity2 "github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/entity"
 	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/transaction/entity"
 	"strings"
 )
@@ -25,7 +26,7 @@ func (db *DB) CreateTransaction(tx entity.Transaction) error {
 	return nil
 }
 
-func (db *DB) GetUserTransactions(userID string, pg entity.Paginate) ([]entity.Transaction, error) {
+func (db *DB) GetUserTransactions(userID string, pg entity2.Paginate) ([]entity.Transaction, error) {
 	const op = "mysql.GetUserTransactions"
 
 	var result []entity.Transaction
@@ -42,7 +43,7 @@ func (db *DB) GetUserTransactions(userID string, pg entity.Paginate) ([]entity.T
 	return result, nil
 }
 
-func (db *DB) GetTransactions(pg entity.Paginate) ([]entity.Transaction, error) {
+func (db *DB) GetTransactions(pg entity2.Paginate) ([]entity.Transaction, error) {
 	const op = "mysql.GetTransactions"
 
 	var result []entity.Transaction
@@ -59,7 +60,7 @@ func (db *DB) GetTransactions(pg entity.Paginate) ([]entity.Transaction, error) 
 	return result, nil
 }
 
-func buildGetAllTransactionQuery(pg entity.Paginate) (string, []interface{}) {
+func buildGetAllTransactionQuery(pg entity2.Paginate) (string, []interface{}) {
 	baseQuery := "SELECT id, type, amount, created_at FROM transactions"
 	var conditions []string
 	var args []interface{}
@@ -90,7 +91,7 @@ func buildGetAllTransactionQuery(pg entity.Paginate) (string, []interface{}) {
 	return baseQuery, args
 }
 
-func buildGetUserTransactionQuery(userID string, pg entity.Paginate) (string, []interface{}) {
+func buildGetUserTransactionQuery(userID string, pg entity2.Paginate) (string, []interface{}) {
 	baseQuery := "SELECT id, type, amount, created_at FROM transactions"
 	var conditions []string
 	var args []interface{}
