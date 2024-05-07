@@ -1,0 +1,30 @@
+---
+type: yml
+#this is just example config not use it on production
+
+application:
+  graceful_shutdown_timeout: 10
+
+http_server:
+  port: 8089
+
+broker:
+  username: user
+  password: password
+  host: localhost
+  port: 5672
+
+
+
+mysql:
+  port: 3307
+  host: localhost
+  db_name: wallet_db
+  username: testuser
+  password: veryhardhardpasswordformysql
+
+redis:
+  port: 6379
+  host: localhost
+  db: 0
+  password: ""

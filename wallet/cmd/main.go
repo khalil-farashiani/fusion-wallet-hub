@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/adapter/rabbitmq"
 	balanceService "github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/balance/service"
 	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/config"
+	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/delivery/consumer"
 	httpserver "github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/delivery/http"
 	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/repository/migrator"
 	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/repository/mysql"
@@ -18,7 +20,7 @@ import (
 )
 
 const (
-	ConfigAddressArg        = 2
+	ConfigAddressArg        = 1
 	notEnoughArgumentErrMsg = "error: config address is a required argument"
 )
 
@@ -30,7 +32,7 @@ func main() {
 	}()
 
 	args := os.Args
-	if len(args) < 3 {
+	if len(args) < 2 {
 		panic(notEnoughArgumentErrMsg)
 	}
 	cfg := config.Load(args[ConfigAddressArg])
@@ -38,18 +40,23 @@ func main() {
 	mgr := migrator.New(cfg.Mysql)
 	mgr.Up()
 
-	authSvc, userSvc := setupServices(cfg)
-	server := httpserver.New(cfg, authSvc, userSvc)
+	balanceSvc, transactionSvc, broker := setupServices(cfg)
+	server := httpserver.New(cfg, balanceSvc, transactionSvc)
+	consumer := consumer.New(cfg, balanceSvc, transactionSvc, broker)
 
 	go func() {
 		server.Serve()
+	}()
+
+	go func() {
+		consumer.Start()
 	}()
 
 	sig := waitExitSignal()
 	log.Println(sig.String())
 }
 
-func setupServices(cfg config.Config) (balanceService.Service, transactionService.Service) {
+func setupServices(cfg config.Config) (balanceService.Service, transactionService.Service, rabbitmq.Adapter) {
 	MysqlRepo := mysql.New(cfg.Mysql)
 
 	bSQL := balanceMysql.New(MysqlRepo)
@@ -57,7 +64,9 @@ func setupServices(cfg config.Config) (balanceService.Service, transactionServic
 
 	bs := balanceService.New(bSQL)
 	ts := transactionService.New(tSQL)
-	return bs, ts
+
+	broker := rabbitmq.New(cfg.Broker)
+	return bs, ts, broker
 }
 
 // waitExitSignal get os signals
