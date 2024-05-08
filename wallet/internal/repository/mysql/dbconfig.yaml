@@ -1,0 +1,5 @@
+production:
+  dialect: mysql
+  datasource: testuser:veryhardhardpasswordformysql@(localhost:3308)/wallet_db?parseTime=true
+  dir: internal/repository/mysql/migrations
+  table: gorp_migrations

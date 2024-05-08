@@ -3,12 +3,13 @@ package migrator
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/repository/mysql"
 	migrate "github.com/rubenv/sql-migrate"
 	"log"
 )
 
-const migrationAddressDirectory = "./repository/mysql/migrations"
+const migrationAddressDirectory = "../internal/repository/mysql/migrations"
 
 type Migrator struct {
 	dialect    string

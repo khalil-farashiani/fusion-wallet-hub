@@ -30,7 +30,10 @@ func (db *DB) GetUserTransactions(userID string, pg entity2.Paginate) ([]entity.
 	const op = "mysql.GetUserTransactions"
 
 	var result []entity.Transaction
-	if err := db.conn.Conn().QueryRow(buildGetUserTransactionQuery(userID, pg)).Scan(&result); err != nil {
+	query, args := buildGetUserTransactionQuery(userID, pg)
+	rows, err := db.conn.Conn().Query(query, args...)
+	defer rows.Close()
+	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, richerror.New(op).WithErr(err).
 				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.NotFound)
@@ -40,6 +43,15 @@ func (db *DB) GetUserTransactions(userID string, pg entity2.Paginate) ([]entity.
 		return nil, richerror.New(op).WithErr(err).
 			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.Unexpected)
 	}
+
+	for rows.Next() {
+		var tx entity.Transaction
+		if err := rows.Scan(&tx.ID, &tx.Type, &tx.Amount, &tx.CreatedAt); err != nil {
+			return nil, richerror.New(op).WithErr(err).WithMessage(errmsg.ErrorMsgSomethingWentWrong).WithKind(richerror.Unexpected)
+		}
+		result = append(result, tx)
+	}
+	return result, nil
 	return result, nil
 }
 
@@ -47,7 +59,11 @@ func (db *DB) GetTransactions(pg entity2.Paginate) ([]entity.Transaction, error)
 	const op = "mysql.GetTransactions"
 
 	var result []entity.Transaction
-	if err := db.conn.Conn().QueryRow(buildGetAllTransactionQuery(pg)).Scan(&result); err != nil {
+	query, args := buildGetAllTransactionQuery(pg)
+	rows, err := db.conn.Conn().Query(query, args...)
+	defer rows.Close()
+
+	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, richerror.New(op).WithErr(err).
 				WithMessage(errmsg.ErrorMsgNotFound).WithKind(richerror.NotFound)
@@ -57,11 +73,19 @@ func (db *DB) GetTransactions(pg entity2.Paginate) ([]entity.Transaction, error)
 		return nil, richerror.New(op).WithErr(err).
 			WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.Unexpected)
 	}
+
+	for rows.Next() {
+		var tx entity.Transaction
+		if err := rows.Scan(&tx.ID, &tx.Type, &tx.Amount, &tx.AccountID, &tx.CreatedAt); err != nil {
+			return nil, richerror.New(op).WithErr(err).WithMessage(errmsg.ErrorMsgSomethingWentWrong).WithKind(richerror.Unexpected)
+		}
+		result = append(result, tx)
+	}
 	return result, nil
 }
 
 func buildGetAllTransactionQuery(pg entity2.Paginate) (string, []interface{}) {
-	baseQuery := "SELECT id, type, amount, created_at FROM transactions"
+	baseQuery := "SELECT id, type, amount, account_id, created_at FROM transaction"
 	var conditions []string
 	var args []interface{}
 
@@ -92,7 +116,7 @@ func buildGetAllTransactionQuery(pg entity2.Paginate) (string, []interface{}) {
 }
 
 func buildGetUserTransactionQuery(userID string, pg entity2.Paginate) (string, []interface{}) {
-	baseQuery := "SELECT id, type, amount, created_at FROM transactions"
+	baseQuery := "SELECT id, type, amount, created_at FROM transaction"
 	var conditions []string
 	var args []interface{}
 
