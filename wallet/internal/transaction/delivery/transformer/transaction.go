@@ -10,6 +10,7 @@ import (
 	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/transaction/delivery/http/resurece"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,8 @@ const (
 	invalidCursorErrMsg         = "invalid cursor format"
 	invalidLimitErrMsg          = "invalid limit format"
 	invalidJSONBodyErrMsg       = "invalid json body"
+
+	defaultLimitValue = 100
 )
 
 type builder struct {
@@ -107,18 +110,17 @@ func (b *builder) SetLimit() contract.Transformer {
 			b.err = richerror.New(op).WithErr(errors.New(invalidLimitErrMsg))
 			return b
 		}
-		b.filters.Paginate.Cursor = int64(limitInt)
+		b.filters.Paginate.Limit = int64(limitInt)
+		return b
 	}
+	b.filters.Paginate.Limit = defaultLimitValue
 	return b
 }
 
 func validateTransactionCreateBody(req resurece.CreateTransactionRequest) error {
 	const op = "transactionTransformer.validateTransactionCreateBody"
 
-	if req.Amount == 0 {
-		return richerror.New(op).WithErr(errors.New(invalidJSONBodyErrMsg))
-	}
-	if req.Type != 1 && req.Type != 2 && req.Type != 3 {
+	if (req.Amount == 0) || (req.Type != 1 && req.Type != 2) || strings.TrimSpace(req.AccountID) == "" {
 		return richerror.New(op).WithErr(errors.New(invalidJSONBodyErrMsg))
 	}
 	return nil

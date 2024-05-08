@@ -15,7 +15,7 @@ func (h *Handler) GetUserTransaction(w http.ResponseWriter, r *http.Request) {
 		SetLimit().
 		Transform()
 
-	result, err := h.transactionSvc.GetAll(*params.Paginate)
+	result, err := h.transactionSvc.UserTransactions(params.UserID, params.Paginate)
 	if err != nil {
 		msg, code := http_msg.Error(err)
 		http_helper.JSONErr(w, code, msg)

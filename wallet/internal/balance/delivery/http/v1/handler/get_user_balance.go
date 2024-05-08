@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/khalil-farashiani/fusion-wallet-hub/pkg/http_helper"
 	"github.com/khalil-farashiani/fusion-wallet-hub/pkg/http_msg"
+	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/balance/delivery/dto"
 	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/balance/delivery/transformer"
 	"net/http"
 )
@@ -24,5 +25,5 @@ func (h *Handler) GetUserBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http_helper.JSON(w, http.StatusOK, result)
+	http_helper.JSON(w, http.StatusOK, dto.ToUserBalanceResponse(result))
 }

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/adapter/rabbitmq"
 	"github.com/khalil-farashiani/fusion-wallet-hub/wallet/internal/repository/mysql"
 	"time"
 )
@@ -14,7 +15,8 @@ type HTTPServer struct {
 }
 
 type Config struct {
-	Application Application  `koanf:"application"`
-	HTTPServer  HTTPServer   `koanf:"http_server"`
-	Mysql       mysql.Config `koanf:"mysql"`
+	Application Application     `koanf:"application"`
+	HTTPServer  HTTPServer      `koanf:"http_server"`
+	Broker      rabbitmq.Config `koanf:"broker"`
+	Mysql       mysql.Config    `koanf:"mysql"`
 }

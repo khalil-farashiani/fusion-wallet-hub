@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type Filters struct {
-	Paginate *Paginate
+	Paginate Paginate
 	UserID   string
 }
 
