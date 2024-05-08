@@ -1,0 +1,194 @@
+{
+	"info": {
+		"_postman_id": "9a9576c4-b786-430b-9385-402bf78f0438",
+		"name": "fusion-wallet",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15078364"
+	},
+	"item": [
+		{
+			"name": "discount",
+			"item": [
+				{
+					"name": "health check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8088/health-check",
+							"host": [
+								"localhost"
+							],
+							"port": "8088",
+							"path": [
+								"health-check"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create redeem",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Testtt\",\n    \"amount\": 10000,\n    \"quantity\": 100 \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8088/redeem",
+							"host": [
+								"localhost"
+							],
+							"port": "8088",
+							"path": [
+								"redeem"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "redister-request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8088/register-redeem?user_id=123&title=Testtt",
+							"host": [
+								"localhost"
+							],
+							"port": "8088",
+							"path": [
+								"register-redeem"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "123"
+								},
+								{
+									"key": "title",
+									"value": "Testtt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8088/redeem/reports?status=valid",
+							"host": [
+								"localhost"
+							],
+							"port": "8088",
+							"path": [
+								"redeem",
+								"reports"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "valid"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "wallet",
+			"item": [
+				{
+					"name": "get user balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8089/balances/users/123",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"balances",
+								"users",
+								"123"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create transaction",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "get transaction",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8089/transactions?cursor=2&limit=2",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "cursor",
+									"value": "2"
+								},
+								{
+									"key": "limit",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user transactions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8089/transactions/users/123",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"transactions",
+								"users",
+								"123"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
