@@ -26,5 +26,4 @@ func JSONErr(w http.ResponseWriter, code int, err string) {
 	w.WriteHeader(code)
 	enc := json.NewEncoder(w)
 	_ = enc.Encode(simpleErr{Err: err})
-
 }
