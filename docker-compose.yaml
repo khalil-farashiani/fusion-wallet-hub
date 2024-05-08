@@ -1,0 +1,82 @@
+version: '3.9'
+
+services:
+#  wallet:
+#    environment:
+#      TEST: "test"
+#    build:
+#      context: ./wallet
+#      dockerfile: Dockerfile
+#    restart: on-failure
+#    ports:
+#      - "8095:8095"
+#    depends_on:
+#      - "wallet_database"
+#    networks:
+#      - "mynet"
+
+#  discount:
+#    build:
+#      context: ./discount
+#      dockerfile: Dockerfile
+#    restart: on-failure
+#    ports:
+#      - "8096:8096"
+#    depends_on:
+#      - "discount_database"
+#    networks:
+#      - "mynet"
+
+  wallet_database:
+    platform: "linux/x86_64"
+    image: "docker.arvancloud.ir/mysql:8.4"
+    container_name: "db-mysql"
+    ports:
+      - "3307:3307"
+    environment:
+      MYSQL_DATABASE: "wallet_db"
+      MYSQL_ROOT_PASSWORD: "lila_db"
+    volumes:
+      - "./resources/db.sql:/docker-entrypoint-initdb.d/db.sql"
+    networks:
+      - "mynet"
+
+  discount_database:
+    platform: "linux/x86_64"
+    container_name: "discount_database"
+    restart: always
+    image: "docker.arvancloud.ir/mysql:8.4"
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: "discount_db"
+      MYSQL_ROOT_PASSWORD: "veryhardhardpasswordformysql"
+      MYSQL_USER: "testuser"
+      MYSQL_PASSWORD: "veryhardhardpasswordformysql"
+    volumes:
+      - "./resources/db.sql:/docker-entrypoint-initdb.d/db.sql"
+    networks:
+      - "mynet"
+
+  rabbitmq:
+    image: "docker.arvancloud.ir/rabbitmq:3.13.2-management"
+    hostname: "rabbitmq"
+    environment:
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "password"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  redis:
+    image: "docker.arvancloud.ir/redis:7.2.4"
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  db-data:
+
+networks:
+  mynet:
+    driver: "bridge"
