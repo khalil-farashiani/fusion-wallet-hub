@@ -2,11 +2,9 @@ version: '3.9'
 
 services:
 #  wallet:
-#    environment:
-#      TEST: "test"
 #    build:
-#      context: ./wallet
-#      dockerfile: Dockerfile
+#      context: .
+#      dockerfile: DockerfileDiscount
 #    restart: on-failure
 #    ports:
 #      - "8095:8095"
@@ -14,14 +12,14 @@ services:
 #      - "wallet_database"
 #    networks:
 #      - "mynet"
-
+#
 #  discount:
 #    build:
-#      context: ./discount
-#      dockerfile: Dockerfile
+#      context: .
+#      dockerfile: DockerfileDiscount
 #    restart: on-failure
 #    ports:
-#      - "8096:8096"
+#      - "8096:8089"
 #    depends_on:
 #      - "discount_database"
 #    networks:
@@ -30,14 +28,17 @@ services:
   wallet_database:
     platform: "linux/x86_64"
     image: "docker.arvancloud.ir/mysql:8.4"
-    container_name: "db-mysql"
+    container_name: "wallet_database"
+    restart: always
     ports:
-      - "3307:3307"
+      - "3307:3306"
     environment:
       MYSQL_DATABASE: "wallet_db"
-      MYSQL_ROOT_PASSWORD: "lila_db"
+      MYSQL_ROOT_PASSWORD: "veryhardhardpasswordformysql"
+      MYSQL_USER: "testuser"
+      MYSQL_PASSWORD: "veryhardhardpasswordformysql"
     volumes:
-      - "./resources/db.sql:/docker-entrypoint-initdb.d/db.sql"
+      - "./resources/db2.sql:/docker-entrypoint-initdb.d/db2.sql"
     networks:
       - "mynet"
 
@@ -67,16 +68,18 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-
+    networks:
+      - "mynet"
   redis:
     image: "docker.arvancloud.ir/redis:7.2.4"
     container_name: redis
     ports:
       - "6379:6379"
+    networks:
+      - "mynet"
 
 volumes:
   db-data:
 
 networks:
   mynet:
-    driver: "bridge"

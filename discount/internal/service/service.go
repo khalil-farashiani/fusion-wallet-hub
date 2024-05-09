@@ -7,6 +7,11 @@ import (
 	"github.com/khalil-farashiani/fusion-wallet-hub/pkg/richerror"
 )
 
+const (
+	endOfInventory     = "end of inventory"
+	unusedRedeemStatus = "NEW"
+)
+
 type Repository interface {
 	CreateUserRedeemRecord(redeem entity.RedeemReport) error
 	IsUserUseRedeemBefore(redeem entity.RedeemReport) (bool, error)
@@ -64,7 +69,15 @@ func (s Service) SetUserRedeem(userID string, redeemRep entity.RedeemReport) err
 
 	//check amount from cache
 	redeemRep.UserId = userID
-	redeemRep.Status = "NEW"
+	redeemRep.Status = unusedRedeemStatus
+	redeemCap, err := s.cache.DecrementRedeemCount(redeemRep.Title)
+	if err != nil {
+		return richerror.New(op).WithErr(err).WithKind(richerror.Unexpected)
+	}
+	if redeemCap <= 1 {
+		return richerror.New(op).WithMessage(endOfInventory)
+	}
+
 	isUserUseRedeemBefore, err := s.repo.IsUserUseRedeemBefore(redeemRep)
 	if err != nil {
 		//might better sanitize request
@@ -92,7 +105,7 @@ func (s Service) NewRedeem(redeem entity.Redeem) error {
 	if err != nil {
 		return richerror.New(op).WithErr(err).WithKind(richerror.Unexpected)
 	}
-	if err = s.cache.SetInitialRedeemCount(redeem.Title, redeem.Amount); err != nil {
+	if err = s.cache.SetInitialRedeemCount(redeem.Title, redeem.Quantity); err != nil {
 		return richerror.New(op).WithErr(err).WithKind(richerror.Unexpected)
 	}
 	return nil

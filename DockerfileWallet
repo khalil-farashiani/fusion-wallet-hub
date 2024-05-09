@@ -2,13 +2,16 @@ FROM docker.arvancloud.ir/golang:1.22 as builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY wallet/go.mod wallet/go.sum /app/wallet/
+COPY pkg ./pkg
+
+WORKDIR /app/wallet
 
 RUN go mod download
 
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o myapp .
+COPY wallet /app/wallet
+RUN ls
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app/myapp /app/wallet/cmd
 
 FROM docker.arvancloud.ir/alpine:3.19
 
@@ -19,3 +22,4 @@ WORKDIR /root/
 COPY --from=builder /app/myapp .
 
 CMD ["./myapp", "config.yaml"]
+

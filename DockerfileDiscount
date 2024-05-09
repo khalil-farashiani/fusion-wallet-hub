@@ -1,0 +1,25 @@
+FROM docker.arvancloud.ir/golang:1.22 as builder
+
+WORKDIR /app
+
+COPY discount/go.mod discount/go.sum /app/discount/
+COPY pkg ./pkg
+
+WORKDIR /app/discount
+
+RUN go mod download
+
+COPY discount /app/discount
+RUN ls
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app/myapp /app/discount/cmd
+
+FROM docker.arvancloud.ir/alpine:3.19
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+COPY --from=builder /app/myapp .
+
+CMD ["./myapp", "config.yaml"]
+
